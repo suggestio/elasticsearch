@@ -71,6 +71,7 @@ public class GeoShapeQueryParser implements QueryParser {
         String type = null;
         String index = DEFAULTS.INDEX_NAME;
         String shapePath = DEFAULTS.SHAPE_FIELD_NAME;
+        String routing = null;
 
         XContentParser.Token token;
         String currentFieldName = null;
@@ -109,6 +110,8 @@ public class GeoShapeQueryParser implements QueryParser {
                                         index = parser.text();
                                     } else if ("path".equals(currentFieldName)) {
                                         shapePath = parser.text();
+                                    } else if ("routing".equals(currentFieldName)) {
+                                        routing = parser.text();
                                     }
                                 }
                             }
@@ -117,7 +120,7 @@ public class GeoShapeQueryParser implements QueryParser {
                             } else if (type == null) {
                                 throw new QueryParsingException(parseContext.index(), "Type for indexed shape not provided");
                             }
-                            shape = fetchService.fetch(id, type, index, shapePath);
+                            shape = fetchService.fetch(id, type, index, shapePath, routing);
                         } else {
                             throw new QueryParsingException(parseContext.index(), "[geo_shape] query does not support [" + currentFieldName + "]");
                         }

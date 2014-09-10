@@ -83,6 +83,7 @@ to 'shapes'.
 * `type` - Index type where the pre-indexed shape is.
 * `path` - The field specified as path containing the pre-indexed shape.
 Defaults to 'shape'.
+* `routing` - The routing key for document with pre-indexed shape, if needed.
 
 The following is an example of using the Filter with a pre-indexed
 shape:
@@ -101,7 +102,8 @@ shape:
                         "id": "DEU",
                         "type": "countries",
                         "index": "shapes",
-                        "path": "location"
+                        "path": "location",
+			"routing": "some_routing_data"
                     }
                 }
             }

@@ -47,6 +47,7 @@ public class GeoShapeFilterBuilder extends BaseFilterBuilder {
 
     private String indexedShapeIndex;
     private String indexedShapePath;
+    private String indexedShapeRouting;
 
     private ShapeRelation relation = null;
     
@@ -161,6 +162,17 @@ public class GeoShapeFilterBuilder extends BaseFilterBuilder {
     }
 
     /**
+     * Sets the routing of indexed Shape document, that contains the Shape itself.
+     *
+     * @param indexedShapeRouting Routing key string.
+     * @return this
+     */
+    public GeoShapeFilterBuilder indexedShapeRouting(String indexedShapeRouting) {
+        this.indexedShapeRouting = indexedShapeRouting;
+        return this;
+    }
+
+    /**
      * Sets the relation of query shape and indexed shape.
      *
      * @param relation relation of the shapes
@@ -192,6 +204,9 @@ public class GeoShapeFilterBuilder extends BaseFilterBuilder {
             }
             if (indexedShapePath != null) {
                 builder.field("path", indexedShapePath);
+            }
+            if (indexedShapeRouting != null) {
+                builder.field("routing", indexedShapeRouting);
             }
             builder.endObject();
         }

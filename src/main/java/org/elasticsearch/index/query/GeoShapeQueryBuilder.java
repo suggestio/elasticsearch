@@ -43,6 +43,7 @@ public class GeoShapeQueryBuilder extends BaseQueryBuilder implements BoostableQ
 
     private String indexedShapeIndex;
     private String indexedShapePath;
+    private String indexedShapeRouting;
 
     private String queryName;
 
@@ -120,6 +121,17 @@ public class GeoShapeQueryBuilder extends BaseQueryBuilder implements BoostableQ
     }
 
     /**
+     * Sets the routing of indexed Shape document, that contains the Shape itself.
+     *
+     * @param indexedShapeRouting Routing key string.
+     * @return this
+     */
+    public GeoShapeQueryBuilder indexedShapeRouting(String indexedShapeRouting) {
+        this.indexedShapeRouting = indexedShapeRouting;
+        return this;
+    }
+
+    /**
      * Sets the query name for the filter that can be used when searching for matched_filters per hit.
      */
     public GeoShapeQueryBuilder queryName(String queryName) {
@@ -148,6 +160,9 @@ public class GeoShapeQueryBuilder extends BaseQueryBuilder implements BoostableQ
             }
             if (indexedShapePath != null) {
                 builder.field("path", indexedShapePath);
+            }
+            if (indexedShapeRouting != null) {
+                builder.field("routing", indexedShapeRouting);
             }
             builder.endObject();
         }

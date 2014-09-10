@@ -94,6 +94,7 @@ public class GeoShapeFilterParser implements FilterParser {
         String type = null;
         String index = DEFAULTS.INDEX_NAME;
         String shapePath = DEFAULTS.SHAPE_FIELD_NAME;
+        String routing = null;
 
         XContentParser.Token token;
         String currentFieldName = null;
@@ -131,6 +132,8 @@ public class GeoShapeFilterParser implements FilterParser {
                                         index = parser.text();
                                     } else if ("path".equals(currentFieldName)) {
                                         shapePath = parser.text();
+                                    } else if ("routing".equals(currentFieldName)) {
+                                        routing = parser.text();
                                     }
                                 }
                             }
@@ -139,7 +142,7 @@ public class GeoShapeFilterParser implements FilterParser {
                             } else if (type == null) {
                                 throw new QueryParsingException(parseContext.index(), "Type for indexed shape not provided");
                             }
-                            shape = fetchService.fetch(id, type, index, shapePath);
+                            shape = fetchService.fetch(id, type, index, shapePath, routing);
                         }  else {
                             throw new QueryParsingException(parseContext.index(), "[geo_shape] filter does not support [" + currentFieldName + "]");
                         }

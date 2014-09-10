@@ -47,6 +47,7 @@ public class ShapeFetchService extends AbstractComponent {
         this.client = client;
     }
 
+
     /**
      * Fetches the Shape with the given ID in the given type and index.
      *
@@ -54,11 +55,15 @@ public class ShapeFetchService extends AbstractComponent {
      * @param type      Index type where the Shape is indexed
      * @param index     Index where the Shape is indexed
      * @param path      Name or path of the field in the Shape Document where the Shape itself is located
+     * @param routing   Routing key string or null, if routing not needed.
      * @return Shape with the given ID
      * @throws IOException Can be thrown while parsing the Shape Document and extracting the Shape
      */
-    public ShapeBuilder fetch(String id, String type, String index, String path) throws IOException {
-        GetResponse response = client.get(new GetRequest(index, type, id).preference("_local").operationThreaded(false)).actionGet();
+    public ShapeBuilder fetch(String id, String type, String index, String path, String routing) throws IOException {
+        GetRequest getReq = new GetRequest(index, type, id).preference("_local").operationThreaded(false);
+        if (routing != null)
+            getReq = getReq.routing(routing);
+        GetResponse response = client.get(getReq).actionGet();
         if (!response.isExists()) {
             throw new ElasticsearchIllegalArgumentException("Shape with ID [" + id + "] in type [" + type + "] not found");
         }
@@ -90,4 +95,5 @@ public class ShapeFetchService extends AbstractComponent {
             }
         }
     }
+
 }

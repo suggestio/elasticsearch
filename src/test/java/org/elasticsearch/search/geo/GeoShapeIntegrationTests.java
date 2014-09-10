@@ -255,6 +255,52 @@ public class GeoShapeIntegrationTests extends ElasticsearchIntegrationTest {
         assertHitCount(result, 1);
     }
 
+
+    @Test
+    /** Same as testParsingMultipleShapes(), but with mandatory routing enabled. See #7663. */
+    public void testParsingMultipleShapesWithRouting() throws Exception {
+        String mapping = XContentFactory.jsonBuilder()
+                .startObject()
+                .startObject("type1")
+                .startObject("_routing")
+                .field("required", true)
+                .field("path", "routing_key")
+                .endObject()
+                .startObject("properties")
+                .startObject("location1")
+                .field("type", "geo_shape")
+                .endObject()
+                .startObject("location2")
+                .field("type", "geo_shape")
+                .endObject()
+                .endObject()
+                .endObject()
+                .endObject()
+                .string();
+
+        assertAcked(prepareCreate("test").addMapping("type1", mapping));
+        ensureYellow();
+
+        String p1 = "\"location1\" : {\"type\":\"polygon\", \"coordinates\":[[[-10,-10],[10,-10],[10,10],[-10,10],[-10,-10]]]}";
+        String p2 = "\"location2\" : {\"type\":\"polygon\", \"coordinates\":[[[-20,-20],[20,-20],[20,20],[-20,20],[-20,-20]]]}";
+        String p3 = "\"routing_key\" : \"qwerty\"";
+        String o1 = "{" + p1 + ", " + p2 + ", " + p3 + "}";
+
+        indexRandom(true, client().prepareIndex("test", "type1", "1").setSource(o1));
+
+        String filter = "{\"geo_shape\": {\"location2\": {\"indexed_shape\": {"
+                + "\"id\": \"1\","
+                + "\"type\": \"type1\","
+                + "\"index\": \"test\","
+                + "\"path\": \"location2\","
+                + "\"routing\": \"qwerty\""
+                + "}}}}";
+
+        SearchResponse result = client().prepareSearch("test").setQuery(QueryBuilders.matchAllQuery()).setPostFilter(filter).execute().actionGet();
+        assertSearchResponse(result);
+        assertHitCount(result, 1);
+    }
+
     @Test
     public void testShapeFetching_path() throws Exception {
         createIndex("shapes");
